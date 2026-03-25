@@ -7,9 +7,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="AIStudyPlanner - Smart study planner for students">
     <title>{% block title %}AIStudyPlanner{% endblock %} | Dashboard</title>
+
+    <!-- Google Fonts — Inter for clean modern typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <!-- Inlined Main Stylesheet (Failsafe for Vercel Static Serving Issues) -->
+    <style>
+/* ═══════════════════════════════════════════════════════════════
+   AIStudyPlanner — Main Stylesheet (Inlined)
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  --bg-primary:    #0f1117;
+  --bg-secondary:  #1a1d2e;
+  --bg-tertiary:   #242840;
+  --bg-card:       #1e2235;
+  --accent-purple:  #7c6ff7;
+  --accent-blue:    #4f9dff;
+  --accent-cyan:    #22d3ee;
+  --accent-green:   #34d399;
+  --accent-orange:  #fb923c;
+  --accent-red:     #f87171;
+  --accent-yellow:  #fcd34d;
+  --text-primary:   #e8eaf6;
+  --text-secondary: #9da3c4;
+  --text-muted:     #6b7280;
+  --border:         #2d3158;
+  --border-light:   #3d4470;
+  --shadow-sm:  0 2px 8px rgba(0,0,0,0.3);
+  --shadow-md:  0 4px 20px rgba(0,0,0,0.4);
+  --shadow-lg:  0 8px 40px rgba(0,0,0,0.5);
+  --glow-purple: 0 0 20px rgba(124, 111, 247, 0.3);
+  --glow-green:  0 0 15px rgba(52, 211, 153, 0.3);
+  --sidebar-width: 260px;
+  --font-main: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --transition: 0.2s ease;
+  --transition-slow: 0.4s ease;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-main); background-color: var(--bg-primary); color: var(--text-primary); line-height: 1.6; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+a { color: var(--accent-purple); text-decoration: none; transition: color var(--transition); }
+a:hover { color: var(--accent-cyan); }
+.app-layout { display: flex; min-height: 100vh; }
+.sidebar { width: var(--sidebar-width); background: var(--bg-secondary); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; overflow-y: auto; transition: transform var(--transition-slow); }
+.sidebar-brand { padding: 1.5rem 1.5rem 1rem; border-bottom: 1px solid var(--border); }
+.brand-logo { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+.brand-icon { width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue)); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: var(--glow-purple); }
+.brand-text { font-size: 1.1rem; font-weight: 800; background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.sidebar-user { padding: 0.75rem 1.5rem; display: flex; align-items: center; gap: 0.75rem; }
+.user-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; color: white; text-transform: uppercase; flex-shrink: 0; }
+.user-info { overflow: hidden; }
+.user-name { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-label { font-size: 0.75rem; color: var(--text-muted); }
+.sidebar-nav { padding: 1rem 0; flex: 1; }
+.nav-section-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); padding: 0.5rem 1.5rem 0.25rem; margin-top: 0.5rem; }
+.nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.7rem 1.5rem; color: var(--text-secondary); font-size: 0.9rem; font-weight: 500; border-left: 3px solid transparent; transition: all var(--transition); cursor: pointer; }
+.nav-item:hover { background: var(--bg-tertiary); color: var(--text-primary); border-left-color: var(--accent-purple); }
+.nav-item.active { background: rgba(124, 111, 247, 0.1); color: var(--accent-purple); border-left-color: var(--accent-purple); }
+.sidebar-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border); }
+.logout-btn { display: flex; align-items: center; gap: 0.75rem; width: 100%; padding: 0.65rem 1rem; background: rgba(248, 113, 113, 0.1); border: 1px solid rgba(248, 113, 113, 0.2); border-radius: var(--radius-md); color: var(--accent-red); font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all var(--transition); }
+.main-content { margin-left: var(--sidebar-width); flex: 1; min-height: 100vh; padding: 2rem; max-width: calc(100vw - var(--sidebar-width)); }
+.panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.5rem; }
+.panel-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem; }
+.page-header { margin-bottom: 2rem; }
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
+.stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; position: relative; overflow: hidden; transition: transform var(--transition), box-shadow var(--transition); }
+.stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent-purple); }
+.stat-value { font-size: 2rem; font-weight: 800; color: var(--text-primary); line-height: 1; }
+.progress-container { margin: 0.5rem 0; }
+.progress-bar-track { height: 8px; background: var(--bg-tertiary); border-radius: 50px; overflow: hidden; }
+.progress-bar-fill { height: 100%; border-radius: 50px; background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan)); width: 0%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 10px rgba(124, 111, 247, 0.5); }
+.alert { padding: 0.875rem 1.25rem; border-radius: var(--radius-md); font-size: 0.875rem; font-weight: 500; border-left: 4px solid; display: flex; align-items: flex-start; gap: 0.75rem; box-shadow: var(--shadow-md); margin-bottom: 0.75rem; position: relative; }
+.alert-success { background: rgba(52, 211, 153, 0.1); border-color: var(--accent-green); color: var(--accent-green); }
+.alert-close { position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: currentColor; cursor: pointer; opacity: 0.6; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+/* Note: Simplified inlining for deployment reliability. */
+    </style>
     {% block extra_css %}{% endblock %}
 </head>
 
@@ -17,7 +95,7 @@
 
     <!-- ── FLASH MESSAGES ────────────────────────────── -->
     {% if messages %}
-    <div class="messages-container" role="alert" aria-live="polite">
+    <div class="messages-container" role="alert" aria-live="polite" style="position: fixed; top: 1.5rem; right: 1.5rem; z-index: 1000; display: flex; flex-direction: column; gap: 0.75rem; max-width: 380px;">
         {% for message in messages %}
         <div class="alert alert-{{ message.tags }}">
             <span>{% if message.tags == 'success' %}✓{% elif message.tags == 'error' %}✕{% elif message.tags ==
@@ -115,7 +193,40 @@
 
     </div><!-- /.app-layout -->
 
-    <script src="{% static 'js/app.js' %}"></script>
+    <!-- Inlined Main JS -->
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const bars = document.querySelectorAll('.progress-bar-fill');
+    bars.forEach(function (bar) {
+        const targetValue = parseInt(bar.getAttribute('data-progress')) || 0;
+        setTimeout(function () { bar.style.width = targetValue + '%'; }, 300);
+    });
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(function (alert) {
+        const closeBtn = alert.querySelector('.alert-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function () {
+                alert.style.opacity = '0';
+                setTimeout(function () { if (alert.parentNode) alert.parentNode.removeChild(alert); }, 300);
+            });
+        }
+        setTimeout(function () {
+            alert.style.opacity = '0';
+            setTimeout(function () { if (alert.parentNode) alert.parentNode.removeChild(alert); }, 300);
+        }, 5000);
+    });
+    const currentPath = window.location.pathname;
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(function (item) {
+        const href = item.getAttribute('href');
+        if (href && currentPath.startsWith(href) && href !== '/') {
+            item.classList.add('active');
+        } else if (href === '/dashboard/' && currentPath === '/dashboard/') {
+            item.classList.add('active');
+        }
+    });
+});
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 
