@@ -107,7 +107,7 @@ USE_TZ = True
 # STATIC FILES — CSS, JS, Images
 # ─────────────────────────────────────────────
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']  # Our custom static folder
+STATICFILES_DIRS = [BASE_DIR / 'assets']  # Rename from 'static' to avoid Vercel conflict
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 WHITENOISE_USE_FINDERS = True
