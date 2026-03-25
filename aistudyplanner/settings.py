@@ -21,6 +21,7 @@ SECRET_KEY = 'django-insecure-aistudyplanner-secret-key-change-in-production-xyz
 DEBUG = False
 
 ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = ['https://ai-study-planner-sigma.vercel.app']
 
 # ─────────────────────────────────────────────
 # INSTALLED APPS — all Django + custom apps
@@ -39,7 +40,6 @@ INSTALLED_APPS = [
 # MIDDLEWARE — request/response processing layers
 # ─────────────────────────────────────────────
 MIDDLEWARE = [
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -107,11 +107,9 @@ USE_TZ = True
 # STATIC FILES — CSS, JS, Images
 # ─────────────────────────────────────────────
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'assets']  # Rename from 'static' to avoid Vercel conflict
+STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
-WHITENOISE_USE_FINDERS = True
-WHITENOISE_AUTOREFRESH = True
+DEBUG = False
 
 # ─────────────────────────────────────────────
 # DEFAULT PRIMARY KEY
