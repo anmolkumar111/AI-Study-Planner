@@ -6,6 +6,8 @@ This file controls database, apps, templates, static files, and more.
 """
 
 from pathlib import Path
+import os
+import shutil
 
 # ─────────────────────────────────────────────
 # BASE DIRECTORY — root of the project folder
@@ -78,10 +80,27 @@ WSGI_APPLICATION = 'aistudyplanner.wsgi.application'
 # ─────────────────────────────────────────────
 # DATABASE — SQLite (default, no setup needed)
 # ─────────────────────────────────────────────
+import shutil
+
+# On Vercel, the bundled database is read-only.
+# We copy it to /tmp (which is writable) during startup if we are in a read-only environment.
+BUNDLE_DB_PATH = BASE_DIR / 'db.sqlite3'
+WRITABLE_DB_PATH = '/tmp/db.sqlite3'
+
+if os.environ.get('VERCEL'):
+    if not os.path.exists(WRITABLE_DB_PATH):
+        try:
+            shutil.copy2(str(BUNDLE_DB_PATH), WRITABLE_DB_PATH)
+        except Exception as e:
+            print(f"Error copying DB to /tmp: {e}")
+    DB_NAME = WRITABLE_DB_PATH
+else:
+    DB_NAME = BUNDLE_DB_PATH
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': DB_NAME,
     }
 }
 
