@@ -80,7 +80,6 @@ WSGI_APPLICATION = 'aistudyplanner.wsgi.application'
 # ─────────────────────────────────────────────
 # DATABASE — SQLite (default, no setup needed)
 # ─────────────────────────────────────────────
-import shutil
 
 # On Vercel, the bundled database is read-only.
 # We copy it to /tmp (which is writable) during startup if we are in a read-only environment.
