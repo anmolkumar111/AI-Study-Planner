@@ -18,9 +18,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-aistudyplanner-secret-key-change-in-production-xyz123'
 
 # In production set DEBUG = False
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'ai-study-planner-sigma.vercel.app', '.vercel.app']
+ALLOWED_HOSTS = ['*']
 
 # ─────────────────────────────────────────────
 # INSTALLED APPS — all Django + custom apps
@@ -110,6 +110,8 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']  # Our custom static folder
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_AUTOREFRESH = True
 
 # ─────────────────────────────────────────────
 # DEFAULT PRIMARY KEY
