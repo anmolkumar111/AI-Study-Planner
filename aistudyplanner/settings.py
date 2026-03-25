@@ -20,7 +20,7 @@ SECRET_KEY = 'django-insecure-aistudyplanner-secret-key-change-in-production-xyz
 # In production set DEBUG = False
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'ai-study-planner-sigma.vercel.app', '.vercel.app']
 
 # ─────────────────────────────────────────────
 # INSTALLED APPS — all Django + custom apps
