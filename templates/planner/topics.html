@@ -1,0 +1,105 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Topics — {{ subject.name }}{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header-row">
+    <div class="page-header" style="margin-bottom:0;">
+        <h1>📝 Topics: {{ subject.name }}</h1>
+        <p>
+            {{ topics|length }} topic{{ topics|length|pluralize }} ·
+            <span class="text-success">{{ subject.topics.filter(is_completed=True).count }} completed</span>
+        </p>
+    </div>
+    <a href="{% url 'topic_add' subject.pk %}" class="btn btn-primary" id="btn-add-topic">
+        ➕ Add Topic
+    </a>
+</div>
+
+<!-- Subject Progress Bar -->
+<div class="panel" style="padding: 1.25rem;">
+    <div class="progress-container">
+        <div class="progress-label">
+            <span>Progress for {{ subject.name }}</span>
+            <span class="progress-percent-text text-purple font-bold">{{ progress }}%</span>
+        </div>
+        <div class="progress-bar-track large">
+            <div class="progress-bar-fill {% if progress >= 100 %}green{% endif %}" data-progress="{{ progress }}"
+                data-subject-progress="true"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Topics List -->
+<div class="panel" style="padding: 0;">
+    <div class="panel-header" style="padding: 1.25rem 1.25rem 0.75rem; border-bottom: 1px solid var(--border);">
+        <div class="panel-title">
+            <span class="icon">📋</span>
+            All Topics
+        </div>
+        <!-- Difficulty Breakdown labels -->
+        <div class="flex gap-2">
+            <span class="badge badge-easy">Easy</span>
+            <span class="badge badge-medium">Medium</span>
+            <span class="badge badge-hard">Hard</span>
+        </div>
+    </div>
+
+    {% if topics %}
+    {% for topic in topics %}
+    <div class="topic-item {% if topic.is_completed %}completed{% endif %}" id="topic-row-{{ topic.pk }}">
+
+        <!-- Completion Checkbox — triggers AJAX call via JS -->
+        <input type="checkbox" class="topic-checkbox" id="topic-checkbox-{{ topic.pk }}" data-topic-id="{{ topic.pk }}"
+            {% if topic.is_completed %}checked{% endif %} aria-label="Mark {{ topic.name }} as complete">
+
+        <!-- Topic Info -->
+        <div class="topic-name" style="flex:1;">
+            <label for="topic-checkbox-{{ topic.pk }}" style="cursor:pointer; display:block;">
+                {{ topic.name }}
+            </label>
+            {% if topic.is_completed and topic.completed_at %}
+            <small class="text-muted">Completed {{ topic.completed_at|date:"d M" }}</small>
+            {% endif %}
+        </div>
+
+        <!-- Meta: Difficulty + Hours -->
+        <div class="topic-meta">
+            <span class="badge badge-{{ topic.difficulty }}">{{ topic.get_difficulty_display }}</span>
+            <span class="text-muted" style="font-size:0.78rem;">⏱ {{ topic.estimated_hours }}h</span>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="td-actions">
+            <a href="{% url 'topic_edit' topic.pk %}" class="btn btn-secondary btn-sm btn-icon" title="Edit topic"
+                aria-label="Edit {{ topic.name }}">
+                ✏️
+            </a>
+            <a href="{% url 'topic_delete' topic.pk %}" class="btn btn-danger btn-sm btn-icon" title="Delete topic"
+                aria-label="Delete {{ topic.name }}" onclick="return confirm('Delete topic \'{{ topic.name }}\'?')">
+                🗑️
+            </a>
+        </div>
+
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="empty-state" style="padding: 3rem;">
+        <div class="empty-icon">📝</div>
+        <h3>No topics yet</h3>
+        <p>Add syllabus topics for {{ subject.name }}</p>
+        <a href="{% url 'topic_add' subject.pk %}" class="btn btn-primary">
+            ➕ Add First Topic
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Back Button -->
+<div class="mt-2">
+    <a href="{% url 'subject_list' %}" class="btn btn-secondary">← Back to Subjects</a>
+</div>
+
+{% endblock %}

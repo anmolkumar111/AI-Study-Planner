@@ -1,0 +1,128 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Study Timetable{% endblock %}
+
+{% block content %}
+
+<div class="page-header-row">
+    <div class="page-header" style="margin-bottom:0;">
+        <h1>📅 Study Timetable</h1>
+        <p>Your AI-generated study plan for the next 14 days</p>
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline" id="btn-regenerate">
+            🔄 Regenerate Plan
+        </button>
+    </form>
+</div>
+
+{% if total_sessions > 0 %}
+<div class="cards-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 1.5rem;">
+    <div class="stat-card purple" style="padding: 1rem 1.25rem;">
+        <div class="stat-label">Total Sessions</div>
+        <div class="stat-value purple" style="font-size:1.5rem;">{{ total_sessions }}</div>
+    </div>
+    <div class="stat-card blue" style="padding: 1rem 1.25rem;">
+        <div class="stat-label">Days Planned</div>
+        <div class="stat-value blue" style="font-size:1.5rem;">{{ timetable_data|length }}</div>
+    </div>
+    <div class="stat-card green" style="padding: 1rem 1.25rem;">
+        <div class="stat-label">Plan Status</div>
+        <div class="stat-value green" style="font-size:1rem; padding-top:0.3rem;">✅ Active</div>
+    </div>
+</div>
+{% endif %}
+
+{% if timetable_data %}
+{% for plan_date, tasks in timetable_data %}
+<div class="timetable-day animate-slide-up">
+
+    <div class="timetable-day-header">
+        <div class="timetable-date {% if plan_date == today %}today{% endif %}">
+            {% if plan_date == today %}
+            📍 TODAY —
+            {% endif %}
+            {{ plan_date|date:"l, d F Y" }}
+            {% if plan_date == today %}
+            <span class="badge badge-urgent" style="margin-left:0.5rem;">Today</span>
+            {% endif %}
+        </div>
+        <div class="timetable-total-hours">
+            ⏱ {{ tasks|length }} session{{ tasks|length|pluralize }}
+        </div>
+    </div>
+
+    <div class="timetable-tasks">
+        {% for task in tasks %}
+        <div class="timetable-task">
+
+            <div class="timetable-task-dot {{ task.topic.difficulty }}"></div>
+
+            {% if task.is_done %}
+            <input type="checkbox" class="plan-checkbox" data-plan-id="{{ task.pk }}" checked aria-label="Mark done"
+                style="width:16px; height:16px; flex-shrink:0;">
+            {% else %}
+            <input type="checkbox" class="plan-checkbox" data-plan-id="{{ task.pk }}" aria-label="Mark done"
+                style="width:16px; height:16px; flex-shrink:0;">
+            {% endif %}
+
+            <div style="flex:1;">
+                {% if task.is_done %}
+                <span style="font-size:0.875rem; text-decoration:line-through; opacity:0.6;">
+                    {{ task.topic.name }}
+                </span>
+                {% else %}
+                <span style="font-size:0.875rem;">
+                    {{ task.topic.name }}
+                </span>
+                {% endif %}
+                <span class="text-muted" style="font-size:0.78rem;">
+                    — {{ task.topic.subject.name }}
+                </span>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+                <span class="badge badge-{{ task.topic.difficulty }}">{{ task.topic.difficulty }}</span>
+                <span class="text-cyan" style="font-size:0.78rem; font-weight:700;">
+                    {{ task.suggested_hours }}h
+                </span>
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endfor %}
+
+{% else %}
+<div class="panel empty-state" style="padding: 4rem 2rem;">
+    <div class="empty-icon">📅</div>
+    <h3>No study plan yet</h3>
+    <p>Add subjects with topics and set exam dates to generate your personalized timetable.</p>
+    <div class="flex gap-2" style="justify-content:center; flex-wrap:wrap; margin-top:1rem;">
+        <a href="{% url 'subject_add' %}" class="btn btn-primary">➕ Add Subject</a>
+        <a href="{% url 'exam_add' %}" class="btn btn-outline">📆 Add Exam Date</a>
+    </div>
+</div>
+{% endif %}
+
+<div class="panel"
+    style="margin-top: 2rem; border-color: rgba(124, 111, 247, 0.3); background: rgba(124,111,247,0.05);">
+    <div class="panel-title" style="margin-bottom:0.75rem;">
+        <span class="icon">🤖</span>
+        How the AI Timetable Works
+    </div>
+    <ul style="list-style:none; display:grid; gap:0.5rem; font-size:0.875rem; color: var(--text-secondary);">
+        <li>📌 Subjects with nearest exam dates are <strong style="color:var(--text-primary);">prioritized
+                first</strong></li>
+        <li>⚡ Hard topics are scheduled <strong style="color:var(--text-primary);">before easier ones</strong></li>
+        <li>⏰ Max <strong style="color:var(--text-primary);">6 hours/day</strong> are assigned to prevent burnout</li>
+        <li>📅 Topics are spread across days <strong style="color:var(--text-primary);">before the exam date</strong>
+        </li>
+        <li>🔄 Plan auto-regenerates when new exams or topics are added</li>
+    </ul>
+</div>
+
+{% endblock %}

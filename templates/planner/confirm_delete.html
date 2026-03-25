@@ -1,0 +1,44 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Confirm Delete{% endblock %}
+
+{% block content %}
+
+<div class="delete-card animate-slide-up">
+    <div class="delete-icon">⚠️</div>
+    <h2>Delete {{ item_type }}</h2>
+    <p style="margin: 0.75rem 0 1.5rem; font-size:0.95rem;">
+        Are you sure you want to delete
+        <strong style="color: var(--text-primary);">"{{ item }}"</strong>?
+    </p>
+    <p class="text-danger" style="font-size:0.85rem; margin-bottom:2rem;">
+        ⚠ This action <strong>cannot be undone</strong>.
+        {% if item_type == 'Subject' %}
+        All associated topics and exams will also be deleted.
+        {% endif %}
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="flex gap-2" style="justify-content:center;">
+            {% if cancel_url %}
+            <a href="{% url cancel_url %}" class="btn btn-secondary">
+                ← Cancel
+            </a>
+            {% elif subject_pk %}
+            <a href="{% url 'topic_list' subject_pk %}" class="btn btn-secondary">
+                ← Cancel
+            </a>
+            {% else %}
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                ← Cancel
+            </a>
+            {% endif %}
+            <button type="submit" class="btn btn-danger" id="btn-confirm-delete">
+                🗑️ Yes, Delete
+            </button>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

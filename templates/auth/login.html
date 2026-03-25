@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Login — AIStudyPlanner{% endblock %}
+
+{% block body %}
+<div class="auth-page">
+    <div class="auth-card animate-slide-up">
+
+        <!-- Brand Header -->
+        <div class="auth-brand">
+            <div class="brand-icon">📚</div>
+            <h1>AIStudyPlanner</h1>
+            <p>Welcome back, student! 👋</p>
+        </div>
+
+        <!-- Login Form -->
+        <form method="post" action="{% url 'login' %}" id="login-form" novalidate>
+            {% csrf_token %}
+
+            <!-- Username -->
+            <div class="form-group">
+                <label for="id_username" class="form-label">
+                    Username <span class="required">*</span>
+                </label>
+                <input type="text" name="username" id="id_username" class="form-control" placeholder="Your username"
+                    autocomplete="username" required autofocus value="{{ request.POST.username }}">
+            </div>
+
+            <!-- Password -->
+            <div class="form-group">
+                <label for="id_password" class="form-label">
+                    Password <span class="required">*</span>
+                </label>
+                <input type="password" name="password" id="id_password" class="form-control" placeholder="Your password"
+                    autocomplete="current-password" required>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary w-full" id="btn-login" style="justify-content: center;">
+                🔑 Sign In
+            </button>
+        </form>
+
+        <!-- Register link -->
+        <div class="auth-footer">
+            Don't have an account?
+            <a href="{% url 'register' %}">Create one here</a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

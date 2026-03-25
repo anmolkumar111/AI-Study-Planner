@@ -1,0 +1,76 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>📝 {{ title }}</h1>
+    <p>Topics for subject: <strong>{{ subject.name }}</strong></p>
+</div>
+
+<div class="form-card animate-slide-up">
+    <form method="post" id="topic-form" novalidate>
+        {% csrf_token %}
+
+        <!-- Topic Name -->
+        <div class="form-group">
+            <label for="{{ form.name.id_for_label }}" class="form-label">
+                Topic Name <span class="required">*</span>
+            </label>
+            {{ form.name }}
+            {% if form.name.errors %}
+            {% for error in form.name.errors %}
+            <div class="form-error">⚠ {{ error }}</div>
+            {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Difficulty Level -->
+        <div class="form-group">
+            <label for="{{ form.difficulty.id_for_label }}" class="form-label">
+                Difficulty Level
+            </label>
+            {{ form.difficulty }}
+            <p style="font-size:0.78rem; color:var(--text-muted); margin-top:0.3rem;">
+                Hard topics will be prioritized in your study timetable.
+            </p>
+        </div>
+
+        <!-- Estimated Hours -->
+        <div class="form-group">
+            <label for="{{ form.estimated_hours.id_for_label }}" class="form-label">
+                Estimated Study Hours <span class="required">*</span>
+            </label>
+            {{ form.estimated_hours }}
+            {% if form.estimated_hours.errors %}
+            {% for error in form.estimated_hours.errors %}
+            <div class="form-error">⚠ {{ error }}</div>
+            {% endfor %}
+            {% endif %}
+            <p style="font-size:0.78rem; color:var(--text-muted); margin-top:0.3rem;">
+                How many hours do you think this topic needs? (e.g., 2.5)
+            </p>
+        </div>
+
+        <div class="form-actions">
+            <a href="{% url 'topic_list' subject.pk %}" class="btn btn-secondary">← Cancel</a>
+            <button type="submit" class="btn btn-primary" id="btn-submit-topic">
+                {{ button_text }}
+            </button>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add form-control class to all inputs for styling
+    document.querySelectorAll('input, textarea, select').forEach(function (el) {
+        if (!el.classList.contains('btn')) {
+            el.classList.add('form-control');
+        }
+    });
+</script>
+{% endblock %}

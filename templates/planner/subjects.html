@@ -1,0 +1,104 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}My Subjects{% endblock %}
+
+{% block content %}
+
+<div class="page-header-row">
+    <div class="page-header" style="margin-bottom:0;">
+        <h1>📖 My Subjects</h1>
+        <p>Manage your study subjects and track topics</p>
+    </div>
+    <a href="{% url 'subject_add' %}" class="btn btn-primary" id="btn-add-subject">
+        ➕ Add Subject
+    </a>
+</div>
+
+<!-- Subject Cards Grid -->
+{% if subject_data %}
+<div class="subjects-grid stagger-children">
+    {% for item in subject_data %}
+    <div class="subject-card">
+
+        <!-- Card Top: Name + Progress Badge -->
+        <div class="subject-card-top">
+            <div>
+                <div class="subject-name">{{ item.subject.name }}</div>
+                {% if item.subject.description %}
+                <div class="subject-description" title="{{ item.subject.description }}">
+                    {{ item.subject.description }}
+                </div>
+                {% endif %}
+            </div>
+            <span
+                class="badge {% if item.progress == 100 %}badge-success{% elif item.progress >= 50 %}badge-normal{% else %}badge-medium{% endif %}">
+                {{ item.progress }}%
+            </span>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar-track">
+                <div class="progress-bar-fill {% if item.progress >= 100 %}green{% endif %}"
+                    data-progress="{{ item.progress }}"></div>
+            </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="subject-stats">
+            <div class="subject-stat">
+                <span>📝</span>
+                <span>{{ item.total_topics }} topics</span>
+            </div>
+            <div class="subject-stat">
+                <span>✅</span>
+                <span>{{ item.completed }} done</span>
+            </div>
+            {% if item.exam %}
+            <div class="subject-stat">
+                <span>🎯</span>
+                <span>{{ item.days_left }}d left</span>
+            </div>
+            {% else %}
+            <div class="subject-stat text-muted">
+                <span>📅</span>
+                <span>No exam set</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="subject-actions">
+            <a href="{% url 'topic_list' item.subject.pk %}" class="btn btn-outline btn-sm"
+                id="btn-topics-{{ item.subject.pk }}">
+                📝 Topics
+            </a>
+            <a href="{% url 'topic_add' item.subject.pk %}" class="btn btn-secondary btn-sm">
+                ➕ Add Topic
+            </a>
+            <a href="{% url 'subject_edit' item.subject.pk %}" class="btn btn-secondary btn-sm">
+                ✏️ Edit
+            </a>
+            <a href="{% url 'subject_delete' item.subject.pk %}" class="btn btn-danger btn-sm"
+                onclick="return confirm('Delete subject \'{{ item.subject.name }}\'? All its topics will also be deleted.')">
+                🗑️ Delete
+            </a>
+        </div>
+
+    </div>
+    {% endfor %}
+</div>
+
+{% else %}
+<!-- Empty State -->
+<div class="empty-state panel" style="padding: 4rem 2rem;">
+    <div class="empty-icon">📚</div>
+    <h3>No subjects yet</h3>
+    <p>Add your first subject to start planning your studies</p>
+    <a href="{% url 'subject_add' %}" class="btn btn-primary">
+        ➕ Add Your First Subject
+    </a>
+</div>
+{% endif %}
+
+{% endblock %}

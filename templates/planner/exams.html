@@ -1,0 +1,120 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Exam Dates{% endblock %}
+
+{% block content %}
+
+<div class="page-header-row">
+    <div class="page-header" style="margin-bottom:0;">
+        <h1>🎯 Exam Dates</h1>
+        <p>Manage your exam schedule</p>
+    </div>
+    <a href="{% url 'exam_add' %}" class="btn btn-primary" id="btn-add-exam">
+        📆 Add Exam
+    </a>
+</div>
+
+<!-- Upcoming Exams -->
+<div class="panel">
+    <div class="panel-header">
+        <div class="panel-title">
+            <span class="icon">⏳</span>
+            Upcoming Exams
+        </div>
+    </div>
+
+    {% if upcoming_exams %}
+    <div class="table-container">
+        <table aria-label="Upcoming exams">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Exam Date</th>
+                    <th>Days Left</th>
+                    <th>Urgency</th>
+                    <th>Notes</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for exam in upcoming_exams %}
+                <tr class="exam-row {{ exam.urgency_label }}">
+                    <td><strong>{{ exam.subject.name }}</strong></td>
+                    <td>{{ exam.exam_date|date:"D, d M Y" }}</td>
+                    <td>
+                        <span
+                            class="font-bold {% if exam.days_remaining <= 3 %}text-danger{% elif exam.days_remaining <= 7 %}text-orange{% else %}text-purple{% endif %}"
+                            data-exam-date="{{ exam.exam_date|date:'Y-m-d' }}">
+                            {{ exam.days_remaining }}
+                        </span> days
+                    </td>
+                    <td>
+                        <span class="badge badge-{{ exam.urgency_label }}">
+                            {{ exam.urgency_label|title }}
+                        </span>
+                    </td>
+                    <td class="text-muted" style="font-size:0.8rem; max-width:200px;">
+                        {{ exam.notes|default:"—"|truncatechars:50 }}
+                    </td>
+                    <td>
+                        <div class="td-actions">
+                            <a href="{% url 'exam_edit' exam.pk %}" class="btn btn-secondary btn-sm" title="Edit">✏️
+                                Edit</a>
+                            <a href="{% url 'exam_delete' exam.pk %}" class="btn btn-danger btn-sm"
+                                onclick="return confirm('Delete exam for \'{{ exam.subject.name }}\'?')"
+                                title="Delete">🗑️</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state" style="padding: 2.5rem;">
+        <div class="empty-icon">📅</div>
+        <h3>No upcoming exams</h3>
+        <p>Add exam dates so the AI can plan your study schedule</p>
+        <a href="{% url 'exam_add' %}" class="btn btn-primary">📆 Add Your First Exam</a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Past Exams -->
+{% if past_exams %}
+<div class="panel">
+    <div class="panel-header">
+        <div class="panel-title">
+            <span class="icon">✅</span>
+            Past Exams
+        </div>
+    </div>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Exam Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for exam in past_exams %}
+                <tr>
+                    <td>{{ exam.subject.name }}</td>
+                    <td>{{ exam.exam_date|date:"d M Y" }}</td>
+                    <td><span class="badge badge-past">Past</span></td>
+                    <td>
+                        <a href="{% url 'exam_delete' exam.pk %}" class="btn btn-danger btn-sm"
+                            onclick="return confirm('Delete this past exam record?')">🗑️</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,270 @@
+{% extends "base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- ═══════════════════════════════════════════════════
+     WELCOME BANNER
+     ═══════════════════════════════════════════════════ -->
+<div class="welcome-banner animate-slide-up">
+    <div class="welcome-text">
+        <h2>Hello, <span>{{ request.user.username }}</span>! 👋</h2>
+        <p>Here's your study overview for <strong>{{ today }}</strong></p>
+    </div>
+    <div class="welcome-emoji" aria-hidden="true">🎓</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     STAT CARDS
+     ═══════════════════════════════════════════════════ -->
+<div class="cards-grid stagger-children">
+
+    <!-- Total Subjects -->
+    <div class="stat-card purple">
+        <div class="stat-icon">📖</div>
+        <div class="stat-label">Total Subjects</div>
+        <div class="stat-value purple">{{ total_subjects }}</div>
+    </div>
+
+    <!-- Total Topics -->
+    <div class="stat-card blue">
+        <div class="stat-icon">📝</div>
+        <div class="stat-label">Total Topics</div>
+        <div class="stat-value blue">{{ total_topics }}</div>
+    </div>
+
+    <!-- Completed Topics -->
+    <div class="stat-card green">
+        <div class="stat-icon">✅</div>
+        <div class="stat-label">Completed</div>
+        <div class="stat-value green">{{ completed_topics }}</div>
+    </div>
+
+    <!-- Pending Topics -->
+    <div class="stat-card orange">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-label">Pending</div>
+        <div class="stat-value orange">{{ pending_topics }}</div>
+    </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     OVERALL PROGRESS BAR
+     ═══════════════════════════════════════════════════ -->
+<div class="panel animate-fade-in">
+    <div class="panel-header">
+        <div class="panel-title">
+            <span class="icon">📊</span>
+            Overall Progress
+        </div>
+        <span class="text-purple font-bold" id="overall-progress-text">{{ progress_percent }}%</span>
+    </div>
+
+    <div class="progress-container">
+        <div class="progress-label">
+            <span>{{ completed_topics }} of {{ total_topics }} topics completed</span>
+            <span class="progress-percent-text">{{ progress_percent }}%</span>
+        </div>
+        <!-- data-progress stores the target percentage for JS animation -->
+        <div class="progress-bar-track large">
+            <div class="progress-bar-fill {% if progress_percent >= 75 %}green{% endif %}"
+                data-progress="{{ progress_percent }}"></div>
+        </div>
+    </div>
+
+    {% if progress_percent == 100 %}
+    <p class="text-success mt-2" style="font-size:0.875rem; font-weight:600;">
+        🎉 Amazing! You've completed all your topics!
+    </p>
+    {% elif progress_percent >= 75 %}
+    <p class="text-success mt-2" style="font-size:0.875rem;">
+        🔥 Great work! Almost there!
+    </p>
+    {% elif progress_percent >= 50 %}
+    <p style="font-size:0.875rem; color: var(--accent-yellow); margin-top:0.5rem;">
+        💪 Halfway done — keep going!
+    </p>
+    {% elif total_topics == 0 %}
+    <p class="text-muted mt-2" style="font-size:0.875rem;">
+        📌 Add subjects and topics to start tracking progress.
+        <a href="{% url 'subject_add' %}">Add your first subject →</a>
+    </p>
+    {% else %}
+    <p class="text-muted mt-2" style="font-size:0.875rem;">
+        📚 Keep studying! You can do it!
+    </p>
+    {% endif %}
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     NEAREST EXAM COUNTDOWN
+     ═══════════════════════════════════════════════════ -->
+{% if nearest_exam %}
+<div class="exam-countdown animate-fade-in">
+    <div class="countdown-info">
+        <div class="countdown-subject">🎯 Nearest Exam</div>
+        <div class="countdown-detail">
+            {{ nearest_exam.subject.name }}
+            <span class="text-muted" style="font-weight:400; font-size:0.9rem;">
+                — {{ nearest_exam.exam_date|date:"D, d M Y" }}
+            </span>
+        </div>
+        {% if nearest_exam.notes %}
+        <div class="text-muted" style="font-size:0.8rem; margin-top:0.25rem;">{{ nearest_exam.notes }}</div>
+        {% endif %}
+    </div>
+    <div class="countdown-days">
+        <!-- JS will update this with live countdown -->
+        <div class="days-number {{ nearest_exam.urgency_label }}"
+            data-exam-date="{{ nearest_exam.exam_date|date:'Y-m-d' }}">
+            {{ nearest_exam.days_remaining }}
+        </div>
+        <div class="days-label">Days Left</div>
+    </div>
+</div>
+{% else %}
+<div class="panel" style="border-style: dashed; text-align:center; padding: 1.25rem;">
+    <span style="font-size:1.5rem;">📅</span>
+    <p style="margin:0.5rem 0 0; font-size:0.875rem;">
+        No upcoming exams.
+        <a href="{% url 'exam_add' %}">Add your exam dates →</a>
+    </p>
+</div>
+{% endif %}
+
+
+<!-- ═══════════════════════════════════════════════════
+     TWO-COLUMN GRID: Today's Plan + Subject Progress
+     ═══════════════════════════════════════════════════ -->
+<div class="dashboard-grid">
+
+    <!-- Today's Study Plan -->
+    <div class="panel">
+        <div class="panel-header">
+            <div class="panel-title">
+                <span class="icon">📋</span>
+                Today's Study Plan
+            </div>
+            <a href="{% url 'timetable' %}" class="btn btn-secondary btn-sm">View Full →</a>
+        </div>
+
+        {% if todays_plan %}
+        <!-- Show today's plan tasks as checkable items -->
+        {% for plan_entry in todays_plan %}
+        <div class="plan-item" id="plan-item-{{ plan_entry.pk }}">
+            <input type="checkbox" class="plan-checkbox" id="plan-{{ plan_entry.pk }}"
+                data-plan-id="{{ plan_entry.pk }}" {% if plan_entry.is_done %}checked{% endif %}
+                aria-label="Mark {{ plan_entry.topic.name }} as done">
+            <div class="plan-info">
+                <div class="plan-topic {% if plan_entry.is_done %}text-muted{% endif %}"
+                    style="{% if plan_entry.is_done %}text-decoration: line-through;{% endif %}">
+                    {{ plan_entry.topic.name }}
+                </div>
+                <div class="plan-subject">📖 {{ plan_entry.topic.subject.name }}</div>
+            </div>
+            <div class="plan-hours">{{ plan_entry.suggested_hours }}h</div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="empty-state" style="padding: 2rem;">
+            <div class="empty-icon">✏️</div>
+            <h3>No tasks for today</h3>
+            <p>Add subjects and exam dates to generate your plan.</p>
+            <a href="{% url 'subject_add' %}" class="btn btn-primary btn-sm">Add Subject</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Subject-wise Progress Cards -->
+    <div class="panel">
+        <div class="panel-header">
+            <div class="panel-title">
+                <span class="icon">📚</span>
+                Subject Progress
+            </div>
+            <a href="{% url 'subject_list' %}" class="btn btn-secondary btn-sm">Manage →</a>
+        </div>
+
+        {% if subject_progress %}
+        {% for item in subject_progress %}
+        <div style="margin-bottom: 1.25rem;">
+            <div class="flex justify-between items-center mb-1">
+                <a href="{% url 'topic_list' item.subject.pk %}"
+                    style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary);">
+                    {{ item.subject.name }}
+                </a>
+                <span style="font-size:0.78rem; color: var(--text-muted);">
+                    {{ item.completed }}/{{ item.total_topics }} topics
+                </span>
+            </div>
+            <div class="progress-bar-track">
+                <div class="progress-bar-fill {% if item.progress >= 100 %}green{% endif %}"
+                    data-progress="{{ item.progress }}"></div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="empty-state" style="padding: 2rem;">
+            <div class="empty-icon">📖</div>
+            <h3>No subjects yet</h3>
+            <a href="{% url 'subject_add' %}" class="btn btn-primary btn-sm mt-2">Add First Subject</a>
+        </div>
+        {% endif %}
+    </div>
+
+</div><!-- /.dashboard-grid -->
+
+
+<!-- ═══════════════════════════════════════════════════
+     UPCOMING EXAMS TABLE
+     ═══════════════════════════════════════════════════ -->
+{% if all_exams %}
+<div class="panel">
+    <div class="panel-header">
+        <div class="panel-title">
+            <span class="icon">🎯</span>
+            Upcoming Exams
+        </div>
+        <a href="{% url 'exam_add' %}" class="btn btn-outline btn-sm">+ Add Exam</a>
+    </div>
+
+    <div class="table-container">
+        <table aria-label="Upcoming exams list">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Exam Date</th>
+                    <th>Days Left</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for exam in all_exams %}
+                <tr class="exam-row {{ exam.urgency_label }}">
+                    <td><strong>{{ exam.subject.name }}</strong></td>
+                    <td>{{ exam.exam_date|date:"d M Y" }}</td>
+                    <td>
+                        <span data-exam-date="{{ exam.exam_date|date:'Y-m-d' }}">
+                            {{ exam.days_remaining }}
+                        </span> days
+                    </td>
+                    <td>
+                        <span class="badge badge-{{ exam.urgency_label }}">
+                            {{ exam.urgency_label|title }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

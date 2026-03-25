@@ -1,0 +1,110 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Progress Analytics{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>📊 Progress Analytics</h1>
+    <p>Track your study completion across all subjects</p>
+</div>
+
+<!-- Overall Progress Panel -->
+<div class="panel"
+    style="background: linear-gradient(135deg, rgba(124,111,247,0.1), rgba(79,157,255,0.07)); border-color: rgba(124,111,247,0.3);">
+    <div class="panel-header">
+        <div class="panel-title" style="font-size:1.1rem;">
+            🎯 Overall Completion
+        </div>
+        <span class="text-purple font-bold" style="font-size:1.5rem;">{{ overall_percent }}%</span>
+    </div>
+    <div class="progress-bar-track large" style="margin-bottom:0.75rem;">
+        <div class="progress-bar-fill {% if overall_percent >= 75 %}green{% endif %}"
+            data-progress="{{ overall_percent }}"></div>
+    </div>
+    <div class="flex gap-2 flex-wrap" style="font-size:0.875rem;">
+        <span class="text-success">✅ {{ overall_completed }} completed</span>
+        <span class="text-muted">·</span>
+        <span class="text-muted">📝 {{ overall_total }} total topics</span>
+        <span class="text-muted">·</span>
+        <span class="text-orange">⏳ {{ overall_total|add:"-"|add:overall_completed }} pending</span>
+    </div>
+</div>
+
+<!-- Per-Subject Progress -->
+{% if progress_data %}
+{% for item in progress_data %}
+<div class="progress-subject-card animate-slide-up">
+
+    <!-- Subject Header -->
+    <div class="progress-subject-header">
+        <div>
+            <h3 style="margin-bottom:0.2rem;">{{ item.subject.name }}</h3>
+            {% if item.exam %}
+            <small class="text-muted">
+                🎯 Exam: {{ item.exam.exam_date|date:"d M Y" }}
+                {% if item.days_left >= 0 %}
+                · <span
+                    class="{% if item.days_left <= 3 %}text-danger{% elif item.days_left <= 7 %}text-orange{% else %}text-purple{% endif %}">
+                    {{ item.days_left }} days left
+                </span>
+                {% else %}
+                · <span class="text-muted">Exam passed</span>
+                {% endif %}
+            </small>
+            {% else %}
+            <small class="text-muted">📅 No exam date set</small>
+            {% endif %}
+        </div>
+        <div style="text-align:right;">
+            <div class="font-bold" style="font-size:1.5rem; color: var(--accent-purple);">
+                {{ item.percent }}%
+            </div>
+            <div class="text-muted" style="font-size:0.78rem;">
+                {{ item.completed }}/{{ item.total }} done
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar-track large">
+        <div class="progress-bar-fill {% if item.percent >= 100 %}green{% elif item.percent >= 50 %}{% else %}{% endif %}"
+            data-progress="{{ item.percent }}"></div>
+    </div>
+
+    <!-- Difficulty Breakdown -->
+    <div class="difficulty-breakdown">
+        <div class="diff-item">
+            <span class="diff-label">Easy</span>
+            <div class="diff-val text-success">{{ item.easy_done }}/{{ item.easy_total }}</div>
+        </div>
+        <div class="diff-item">
+            <span class="diff-label">Medium</span>
+            <div class="diff-val text-orange">{{ item.medium_done }}/{{ item.medium_total }}</div>
+        </div>
+        <div class="diff-item">
+            <span class="diff-label">Hard</span>
+            <div class="diff-val text-danger">{{ item.hard_done }}/{{ item.hard_total }}</div>
+        </div>
+    </div>
+
+    <!-- View Topics link -->
+    <div style="margin-top:0.75rem;">
+        <a href="{% url 'topic_list' item.subject.pk %}" class="btn btn-secondary btn-sm">
+            📝 View Topics →
+        </a>
+    </div>
+
+</div>
+{% endfor %}
+
+{% else %}
+<div class="panel empty-state" style="padding:4rem 2rem;">
+    <div class="empty-icon">📊</div>
+    <h3>No progress data yet</h3>
+    <p>Add subjects and topics to start tracking your progress</p>
+    <a href="{% url 'subject_add' %}" class="btn btn-primary mt-2">➕ Add First Subject</a>
+</div>
+{% endif %}
+
+{% endblock %}
