@@ -18,7 +18,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-aistudyplanner-secret-key-change-in-production-xyz123'
 
 # In production set DEBUG = False
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = ['https://ai-study-planner-sigma.vercel.app']
@@ -109,11 +109,15 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-DEBUG = False
+# DEBUG removed from here to top of settings.py
 
 # ─────────────────────────────────────────────
-# DEFAULT PRIMARY KEY
 # ─────────────────────────────────────────────
+# SESSIONS
+# ─────────────────────────────────────────────
+SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'  # Use cookies to bypass Vercel read-only DB
+
+# DEFAULT PRIMARY KEY
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ─────────────────────────────────────────────
